@@ -4,7 +4,7 @@ import pandas as pd
 st.set_page_config(page_title="Solar System Weight Explorer", page_icon="🪐", layout="wide")
 
 # ---------------------------
-# CSS estilo "space dark UI"
+# CSS estilo "space dark UI" + FIXES
 # ---------------------------
 st.markdown("""
 <style>
@@ -16,14 +16,17 @@ st.markdown("""
   color: #e9eef7;
 }
 
-.block-container { padding-top: 1.3rem; padding-bottom: 2.5rem; max-width: 1200px; }
-
-h1, h2, h3, h4 { letter-spacing: 0.2px; }
+/* Más aire arriba y ancho controlado */
+.block-container { 
+  padding-top: 2.2rem; 
+  padding-bottom: 2.5rem; 
+  max-width: 1250px; 
+}
 
 /* Header */
 .header-wrap {
   display:flex; align-items:center; gap:14px;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 .logo {
   width:44px; height:44px; border-radius: 14px;
@@ -58,15 +61,6 @@ h1, h2, h3, h4 { letter-spacing: 0.2px; }
   margin-bottom: 12px;
   display:flex; align-items:center; gap:10px;
 }
-.pill {
-  display:inline-flex; gap:8px; align-items:center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.03);
-  font-size: 12px;
-  color: rgba(233,238,247,0.80);
-}
 
 /* Input grande */
 .stNumberInput label { color: rgba(233,238,247,0.85) !important; font-weight: 700 !important; }
@@ -91,11 +85,10 @@ h1, h2, h3, h4 { letter-spacing: 0.2px; }
   background: linear-gradient(90deg, #ff8a3d, #ff5b62);
   box-shadow: 0 12px 30px rgba(255,100,80,0.25);
 }
-.stButton button:hover {
-  filter: brightness(1.05);
-}
+.stButton button:hover { filter: brightness(1.05); }
 
-/* Toggle / radio */
+/* Radio pills */
+div[role="radiogroup"] { gap: 10px; }
 div[role="radiogroup"] label {
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.10);
@@ -104,7 +97,7 @@ div[role="radiogroup"] label {
 }
 div[role="radiogroup"] label:hover { border-color: rgba(255,255,255,0.18); }
 
-/* Planet cards */
+/* Planet cards - MÁS SEPARACIÓN */
 .pcard {
   background: rgba(255,255,255,0.035);
   border: 1px solid rgba(255,255,255,0.09);
@@ -114,7 +107,8 @@ div[role="radiogroup"] label:hover { border-color: rgba(255,255,255,0.18); }
   display:flex;
   align-items:center;
   justify-content:space-between;
-  min-height: 78px;
+  min-height: 84px;
+  margin-bottom: 16px; /* 👈 separación vertical */
 }
 .p-left { display:flex; align-items:center; gap:14px; }
 .p-dot {
@@ -140,6 +134,7 @@ div[role="radiogroup"] label:hover { border-color: rgba(255,255,255,0.18); }
   color: rgba(233,238,247,0.55);
   text-transform: uppercase;
   letter-spacing: 0.8px;
+  text-align: right;
 }
 
 /* Caja info */
@@ -154,10 +149,18 @@ div[role="radiogroup"] label:hover { border-color: rgba(255,255,255,0.18); }
   line-height: 1.45;
 }
 
-/* Oculta menú de Streamlit para look más limpio */
+/* Separador más sutil */
+hr { border-color: rgba(255,255,255,0.08) !important; }
+
+/* Oculta menú/footer */
 #MainMenu, footer { visibility: hidden; }
 </style>
 """, unsafe_allow_html=True)
+
+# ---------------------------
+# Spacer superior extra (para evitar que se "corte" en algunos embeds)
+# ---------------------------
+st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
 
 # ---------------------------
 # Header
@@ -176,22 +179,21 @@ st.markdown("""
 # Datos planetas (colores + gravedad)
 # ---------------------------
 G_EARTH = 9.80665
-
 planets = [
-    ("Mercury", 3.70,  "linear-gradient(145deg, #8a95a6, #2f3540)"),
-    ("Venus",   8.87,  "linear-gradient(145deg, #ffb25a, #b85a11)"),
+    ("Mercury", 3.70,   "linear-gradient(145deg, #8a95a6, #2f3540)"),
+    ("Venus",   8.87,   "linear-gradient(145deg, #ffb25a, #b85a11)"),
     ("Earth",   9.80665,"linear-gradient(145deg, #2bd0ff, #1f3cff)"),
-    ("Mars",    3.71,  "linear-gradient(145deg, #ff8b4a, #b2321f)"),
-    ("Jupiter", 24.79, "linear-gradient(145deg, #ffb15a, #8a3a14)"),
-    ("Saturn",  10.44, "linear-gradient(145deg, #ffd56a, #b78522)"),
-    ("Uranus",  8.69,  "linear-gradient(145deg, #7de7ff, #1b6b7a)"),
-    ("Neptune", 11.15, "linear-gradient(145deg, #6b86ff, #1430b3)"),
+    ("Mars",    3.71,   "linear-gradient(145deg, #ff8b4a, #b2321f)"),
+    ("Jupiter", 24.79,  "linear-gradient(145deg, #ffb15a, #8a3a14)"),
+    ("Saturn",  10.44,  "linear-gradient(145deg, #ffd56a, #b78522)"),
+    ("Uranus",  8.69,   "linear-gradient(145deg, #7de7ff, #1b6b7a)"),
+    ("Neptune", 11.15,  "linear-gradient(145deg, #6b86ff, #1430b3)"),
 ]
 
 # ---------------------------
 # Layout principal
 # ---------------------------
-left, right = st.columns([1.05, 1.35], gap="large")
+left, right = st.columns([1.05, 1.45], gap="large")
 
 with left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
@@ -217,7 +219,7 @@ with left:
     st.markdown('</div>', unsafe_allow_html=True)
 
 with right:
-    # Convertir peso a kg base para cálculos
+    # Convertir a kg base
     if unit == "kg":
         earth_kg = earth_weight
         out_unit = "KG"
@@ -227,17 +229,16 @@ with right:
         out_unit = "LBS"
         to_display = lambda xkg: xkg * 2.2046226218
 
-    # Crear tarjetas en grid (2 columnas)
-    r1, r2 = st.columns(2, gap="large")
-    grid_cols = [r1, r2]
+    # Grid 2 columnas con MÁS GAP
+    cA, cB = st.columns(2, gap="large")
 
     for idx, (name, g, grad) in enumerate(planets):
         factor = g / G_EARTH
         w_kg = earth_kg * factor
         w_out = to_display(w_kg)
 
-        col = grid_cols[idx % 2]
-        with col:
+        target = cA if idx % 2 == 0 else cB
+        with target:
             st.markdown(f"""
             <div class="pcard">
               <div class="p-left">
@@ -247,17 +248,18 @@ with right:
                   <div class="p-value">{w_out:.1f}<span class="p-unit">{out_unit}</span></div>
                 </div>
               </div>
-              <div class="p-g">GRAVITY: {factor:.3f}G</div>
+              <div class="p-g">GRAVITY:<br>{factor:.3f}G</div>
             </div>
             """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
 
-    # Gráfica opcional abajo para impacto
     df = pd.DataFrame({
         "Planet": [p[0] for p in planets],
-        "Weight": [to_display(earth_kg * (p[1] / G_EARTH)) for p in planets]
+        "Weight": [to_display(earth_kg * (p[1] / G_EARTH)) for p in planets],
     }).set_index("Planet")
 
     st.subheader("📊 Visual Comparison")
     st.bar_chart(df["Weight"])
+
+st.caption("Gravity factors are approximate. Your mass stays the same, but your weight changes with gravity.")
