@@ -1,128 +1,263 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Peso en los Planetas", page_icon="🪐", layout="centered")
+st.set_page_config(page_title="Solar System Weight Explorer", page_icon="🪐", layout="wide")
 
-# 🎨 Estilos personalizados
+# ---------------------------
+# CSS estilo "space dark UI"
+# ---------------------------
 st.markdown("""
 <style>
-.big-title {
-    font-size: 54px;
-    font-weight: 900;
-    text-align: center;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    line-height: 1.1;
+/* Fondo y tipografía general */
+.stApp {
+  background: radial-gradient(1200px 600px at 30% 10%, rgba(255,120,60,0.08), transparent 60%),
+              radial-gradient(900px 500px at 80% 30%, rgba(80,160,255,0.08), transparent 55%),
+              linear-gradient(180deg, #0b0f17, #0a0d14 60%, #070a10);
+  color: #e9eef7;
 }
 
+.block-container { padding-top: 1.3rem; padding-bottom: 2.5rem; max-width: 1200px; }
+
+h1, h2, h3, h4 { letter-spacing: 0.2px; }
+
+/* Header */
+.header-wrap {
+  display:flex; align-items:center; gap:14px;
+  margin-bottom: 18px;
+}
+.logo {
+  width:44px; height:44px; border-radius: 14px;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(255,120,60,0.12);
+  border: 1px solid rgba(255,120,60,0.25);
+  box-shadow: 0 0 0 1px rgba(255,120,60,0.10) inset;
+  font-size: 22px;
+}
+.title {
+  font-size: 40px; font-weight: 900; line-height:1.0; margin:0;
+}
 .subtitle {
-    font-size: 20px;
-    text-align: center;
-    color: gray;
-    margin-bottom: 40px;
+  margin-top: 2px;
+  font-size: 14px; color: rgba(233,238,247,0.65);
 }
 
-.center-box {
-    display: flex;
-    justify-content: center;
+/* Cards */
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 20px;
+  padding: 18px 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
-.stNumberInput > div {
-    width: 100%;
+.card-title {
+  font-size: 13px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: rgba(233,238,247,0.70);
+  margin-bottom: 12px;
+  display:flex; align-items:center; gap:10px;
+}
+.pill {
+  display:inline-flex; gap:8px; align-items:center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  font-size: 12px;
+  color: rgba(233,238,247,0.80);
 }
 
-.stNumberInput label {
-    text-align: center !important;
-    width: 100%;
-    font-size: 18px !important;
-    font-weight: 700 !important;
-}
-
+/* Input grande */
+.stNumberInput label { color: rgba(233,238,247,0.85) !important; font-weight: 700 !important; }
 .stNumberInput input {
-    font-size: 34px !important;
-    text-align: center !important;
-    padding: 12px !important;
-    border-radius: 16px !important;
+  font-size: 34px !important;
+  text-align: left !important;
+  padding: 14px 14px !important;
+  border-radius: 16px !important;
+  border: 2px solid rgba(255,120,60,0.55) !important;
+  background: rgba(255,255,255,0.03) !important;
 }
 
-.hint {
-    text-align: center;
-    color: gray;
-    font-size: 14px;
-    margin-top: 10px;
-    margin-bottom: 30px;
+/* Botón gradiente */
+.stButton button {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 800;
+  border: 0;
+  color: #10131a;
+  background: linear-gradient(90deg, #ff8a3d, #ff5b62);
+  box-shadow: 0 12px 30px rgba(255,100,80,0.25);
 }
+.stButton button:hover {
+  filter: brightness(1.05);
+}
+
+/* Toggle / radio */
+div[role="radiogroup"] label {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  padding: 8px 12px;
+}
+div[role="radiogroup"] label:hover { border-color: rgba(255,255,255,0.18); }
+
+/* Planet cards */
+.pcard {
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 18px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.30);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height: 78px;
+}
+.p-left { display:flex; align-items:center; gap:14px; }
+.p-dot {
+  width: 46px; height: 46px; border-radius: 999px;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.16);
+}
+.p-name {
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: rgba(233,238,247,0.70);
+  margin-bottom: 4px;
+}
+.p-value {
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.0;
+}
+.p-unit { font-size: 12px; color: rgba(233,238,247,0.65); font-weight: 700; margin-left: 6px; }
+.p-g {
+  font-size: 12px;
+  color: rgba(233,238,247,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* Caja info */
+.info {
+  margin-top: 14px;
+  padding: 14px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,120,60,0.18);
+  background: rgba(255,120,60,0.06);
+  color: rgba(233,238,247,0.82);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* Oculta menú de Streamlit para look más limpio */
+#MainMenu, footer { visibility: hidden; }
 </style>
 """, unsafe_allow_html=True)
 
-# 🚀 Header
-st.markdown('<div class="big-title">🪐 ¿Cuánto pesarías en otros planetas?</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">La gravedad cambia en cada planeta, y tu peso también.</div>', unsafe_allow_html=True)
+# ---------------------------
+# Header
+# ---------------------------
+st.markdown("""
+<div class="header-wrap">
+  <div class="logo">🚀</div>
+  <div>
+    <div class="title">Solar System Weight Explorer</div>
+    <div class="subtitle">Discover your weight across the cosmos</div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
-# 🎯 Input perfectamente centrado
-col1, col2, col3 = st.columns([1,2,1])
+# ---------------------------
+# Datos planetas (colores + gravedad)
+# ---------------------------
+G_EARTH = 9.80665
 
-with col2:
-    peso_tierra = st.number_input(
-        "🌍 Ingresa tu peso en la Tierra (kg)",
-        min_value=0.0,
-        value=50.0,
-        step=0.5
-    )
-
-st.markdown('<div class="hint">Prueba diferentes valores y observa cómo cambian los resultados.</div>', unsafe_allow_html=True)
-
-# 🌍 Datos
-G_TIERRA = 9.80665
-planetas = [
-    {"Planeta": "Mercurio", "Emoji": "☿️", "Gravedad": 3.70},
-    {"Planeta": "Venus", "Emoji": "♀️", "Gravedad": 8.87},
-    {"Planeta": "Tierra", "Emoji": "🌍", "Gravedad": 9.80665},
-    {"Planeta": "Marte", "Emoji": "♂️", "Gravedad": 3.71},
-    {"Planeta": "Júpiter", "Emoji": "🟠", "Gravedad": 24.79},
-    {"Planeta": "Saturno", "Emoji": "🪐", "Gravedad": 10.44},
-    {"Planeta": "Urano", "Emoji": "🧊", "Gravedad": 8.69},
-    {"Planeta": "Neptuno", "Emoji": "🔵", "Gravedad": 11.15},
+planets = [
+    ("Mercury", 3.70,  "linear-gradient(145deg, #8a95a6, #2f3540)"),
+    ("Venus",   8.87,  "linear-gradient(145deg, #ffb25a, #b85a11)"),
+    ("Earth",   9.80665,"linear-gradient(145deg, #2bd0ff, #1f3cff)"),
+    ("Mars",    3.71,  "linear-gradient(145deg, #ff8b4a, #b2321f)"),
+    ("Jupiter", 24.79, "linear-gradient(145deg, #ffb15a, #8a3a14)"),
+    ("Saturn",  10.44, "linear-gradient(145deg, #ffd56a, #b78522)"),
+    ("Uranus",  8.69,  "linear-gradient(145deg, #7de7ff, #1b6b7a)"),
+    ("Neptune", 11.15, "linear-gradient(145deg, #6b86ff, #1430b3)"),
 ]
 
-# 📊 Cálculos
-rows = []
-for p in planetas:
-    factor = p["Gravedad"] / G_TIERRA
-    peso_planeta = peso_tierra * factor
-    rows.append({
-        "Planeta": p["Planeta"],
-        "Emoji": p["Emoji"],
-        "Gravedad": p["Gravedad"],
-        "Factor": factor,
-        "Peso": peso_planeta
-    })
+# ---------------------------
+# Layout principal
+# ---------------------------
+left, right = st.columns([1.05, 1.35], gap="large")
 
-df = pd.DataFrame(rows)
-df["Etiqueta"] = df["Emoji"] + " " + df["Planeta"]
+with left:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">🧮 <span>YOUR EARTH WEIGHT</span></div>', unsafe_allow_html=True)
 
-# ✨ Resultados
-st.subheader("✨ Resultados")
+    unit = st.radio("Units", ["kg", "lbs"], horizontal=True, label_visibility="collapsed")
 
-cols = st.columns(2)
+    if unit == "kg":
+        earth_weight = st.number_input(" ", min_value=0.0, value=70.0, step=0.5)
+    else:
+        earth_weight = st.number_input(" ", min_value=0.0, value=154.3, step=0.5)
 
-for i, r in df.iterrows():
-    with cols[i % 2]:
-        st.markdown(f"### {r['Etiqueta']}")
-        st.metric(
-            label="Peso estimado",
-            value=f"{r['Peso']:.2f} kg",
-            delta=f"{(r['Factor'] - 1) * 100:+.1f}% vs Tierra"
-        )
-        st.caption(f"Gravedad: {r['Gravedad']:.2f} m/s²")
+    st.button("Sync with NASA")
 
-st.divider()
+    st.markdown("""
+    <div class="info">
+      <b>Weight</b> is the force of gravity acting on an object. Because planets have different
+      masses and sizes, their surface gravity varies.<br><br>
+      Your <b>mass</b> remains constant everywhere, but your <b>weight</b> changes based on where you stand.
+    </div>
+    """, unsafe_allow_html=True)
 
-# 📈 Gráfica
-st.subheader("📊 Comparación visual")
-st.bar_chart(df.set_index("Etiqueta")["Peso"])
+    st.markdown('</div>', unsafe_allow_html=True)
 
-st.caption(
-    "El peso cambia porque cada planeta tiene una gravedad diferente. "
-    "Cálculo: peso en planeta = peso en Tierra × (gravedad del planeta / gravedad de la Tierra)."
-)
+with right:
+    # Convertir peso a kg base para cálculos
+    if unit == "kg":
+        earth_kg = earth_weight
+        out_unit = "KG"
+        to_display = lambda xkg: xkg
+    else:
+        earth_kg = earth_weight / 2.2046226218
+        out_unit = "LBS"
+        to_display = lambda xkg: xkg * 2.2046226218
+
+    # Crear tarjetas en grid (2 columnas)
+    r1, r2 = st.columns(2, gap="large")
+    grid_cols = [r1, r2]
+
+    for idx, (name, g, grad) in enumerate(planets):
+        factor = g / G_EARTH
+        w_kg = earth_kg * factor
+        w_out = to_display(w_kg)
+
+        col = grid_cols[idx % 2]
+        with col:
+            st.markdown(f"""
+            <div class="pcard">
+              <div class="p-left">
+                <div class="p-dot" style="background:{grad};"></div>
+                <div>
+                  <div class="p-name">{name}</div>
+                  <div class="p-value">{w_out:.1f}<span class="p-unit">{out_unit}</span></div>
+                </div>
+              </div>
+              <div class="p-g">GRAVITY: {factor:.3f}G</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Gráfica opcional abajo para impacto
+    df = pd.DataFrame({
+        "Planet": [p[0] for p in planets],
+        "Weight": [to_display(earth_kg * (p[1] / G_EARTH)) for p in planets]
+    }).set_index("Planet")
+
+    st.subheader("📊 Visual Comparison")
+    st.bar_chart(df["Weight"])
