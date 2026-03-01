@@ -13,14 +13,12 @@ st.markdown("""
   color: #e9eef7;
 }
 
-/* MÁS espacio arriba */
 .block-container { 
   padding-top: 4.5rem; 
   padding-bottom: 2.5rem; 
   max-width: 1250px; 
 }
 
-/* Oculta línea gris superior */
 header {visibility: hidden;}
 
 /* Header */
@@ -54,18 +52,30 @@ header {visibility: hidden;}
   letter-spacing: 1.6px;
   text-transform: uppercase;
   color: rgba(233,238,247,0.65);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .section-gap { height: 18px; }
 
-/* Radio pills */
-div[role="radiogroup"] { gap: 10px; }
-div[role="radiogroup"] label {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 14px;
-  padding: 10px 14px;
+/* Toggle personalizado */
+.toggle {
+  display:flex;
+  gap:12px;
+  margin-bottom:20px;
+}
+.toggle button {
+  padding:10px 20px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.05);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+.toggle button.active {
+  background: linear-gradient(90deg, #ff8a3d, #ff5b62);
+  border: none;
+  color:#10131a;
 }
 
 /* Input */
@@ -88,17 +98,6 @@ div[role="radiogroup"] label {
   border: 0;
   color: #10131a;
   background: linear-gradient(90deg, #ff8a3d, #ff5b62);
-}
-
-/* Info box */
-.info {
-  margin-top: 20px;
-  padding: 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(255,120,60,0.18);
-  background: rgba(255,120,60,0.06);
-  font-size: 14px;
-  line-height: 1.45;
 }
 
 /* Planet cards */
@@ -144,17 +143,17 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Datos
 G_EARTH = 9.80665
+
 planets = [
-    ("Mercury", 3.70, "linear-gradient(145deg, #8a95a6, #2f3540)"),
-    ("Venus", 8.87, "linear-gradient(145deg, #ffb25a, #b85a11)"),
-    ("Earth", 9.80665, "linear-gradient(145deg, #2bd0ff, #1f3cff)"),
-    ("Mars", 3.71, "linear-gradient(145deg, #ff8b4a, #b2321f)"),
-    ("Jupiter", 24.79, "linear-gradient(145deg, #ffb15a, #8a3a14)"),
-    ("Saturn", 10.44, "linear-gradient(145deg, #ffd56a, #b78522)"),
-    ("Uranus", 8.69, "linear-gradient(145deg, #7de7ff, #1b6b7a)"),
-    ("Neptune", 11.15, "linear-gradient(145deg, #6b86ff, #1430b3)"),
+    ("Mercury", 3.70, "#8a95a6"),
+    ("Venus", 8.87, "#ffb25a"),
+    ("Earth", 9.80665, "#2bd0ff"),
+    ("Mars", 3.71, "#ff8b4a"),
+    ("Jupiter", 24.79, "#ffb15a"),
+    ("Saturn", 10.44, "#ffd56a"),
+    ("Uranus", 8.69, "#7de7ff"),
+    ("Neptune", 11.15, "#6b86ff"),
 ]
 
 left, right = st.columns([1.05, 1.45], gap="large")
@@ -162,28 +161,17 @@ left, right = st.columns([1.05, 1.45], gap="large")
 with left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
 
-    unit = st.radio("Units", ["kg", "lbs"], horizontal=True, label_visibility="collapsed")
-
-    st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
+    # Toggle manual limpio
+    unit = st.radio("", ["kg", "lbs"], horizontal=True)
 
     st.markdown('<div class="section-title">Your Earth Weight</div>', unsafe_allow_html=True)
 
     if unit == "kg":
-        earth_weight = st.number_input("Earth weight", min_value=0.0, value=50.0, step=0.5, label_visibility="collapsed")
+        earth_weight = st.number_input("", min_value=0.0, value=50.0, step=0.5)
     else:
-        earth_weight = st.number_input("Earth weight", min_value=0.0, value=110.2, step=0.5, label_visibility="collapsed")
-
-    st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
+        earth_weight = st.number_input("", min_value=0.0, value=110.2, step=0.5)
 
     st.button("Sync with NASA")
-
-    st.markdown("""
-    <div class="info">
-      Weight is the force of gravity acting on an object. Because planets have different
-      masses and sizes, their surface gravity varies.<br><br>
-      Your mass remains constant everywhere, but your weight changes based on where you stand.
-    </div>
-    """, unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -197,18 +185,18 @@ with right:
         out_unit = "LBS"
         to_display = lambda xkg: xkg * 2.2046226218
 
-    cA, cB = st.columns(2, gap="large")
+    col1, col2 = st.columns(2, gap="large")
 
-    for idx, (name, g, grad) in enumerate(planets):
+    for idx, (name, g, color) in enumerate(planets):
         factor = g / G_EARTH
         w_out = to_display(earth_kg * factor)
-        target = cA if idx % 2 == 0 else cB
+        target = col1 if idx % 2 == 0 else col2
 
         with target:
             st.markdown(f"""
             <div class="pcard">
               <div class="p-left">
-                <div class="p-dot" style="background:{grad};"></div>
+                <div class="p-dot" style="background:{color};"></div>
                 <div>
                   <div class="p-name">{name}</div>
                   <div class="p-value">{w_out:.1f}<span class="p-unit">{out_unit}</span></div>
