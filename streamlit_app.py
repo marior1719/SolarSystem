@@ -3,67 +3,76 @@ import pandas as pd
 
 st.set_page_config(page_title="Peso en los Planetas", page_icon="🪐", layout="centered")
 
-# Estilos personalizados
-st.markdown(
-    """
-    <style>
-    .big-title {
-        font-size: 52px;
-        font-weight: 900;
-        text-align: center;
-        margin-top: 8px;
-        margin-bottom: 8px;
-        line-height: 1.05;
-    }
-    .subtitle {
-        font-size: 18px;
-        text-align: center;
-        color: rgba(255,255,255,0.70);
-        margin-bottom: 22px;
-    }
-    .card {
-        padding: 18px;
-        border-radius: 18px;
-        border: 1px solid rgba(255,255,255,0.10);
-        background: rgba(255,255,255,0.03);
-        margin-bottom: 14px;
-    }
-    .hint {
-        text-align: center;
-        color: rgba(255,255,255,0.60);
-        font-size: 13px;
-        margin-top: -8px;
-        margin-bottom: 18px;
-    }
-    .stNumberInput label {
-        font-size: 18px !important;
-        font-weight: 700 !important;
-    }
-    .stNumberInput input {
-        font-size: 30px !important;
-        text-align: center !important;
-        padding: 10px !important;
-        border-radius: 14px !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# 🎨 Estilos personalizados
+st.markdown("""
+<style>
+.big-title {
+    font-size: 54px;
+    font-weight: 900;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.1;
+}
 
-# Header
+.subtitle {
+    font-size: 20px;
+    text-align: center;
+    color: gray;
+    margin-bottom: 40px;
+}
+
+.center-box {
+    display: flex;
+    justify-content: center;
+}
+
+.stNumberInput > div {
+    width: 100%;
+}
+
+.stNumberInput label {
+    text-align: center !important;
+    width: 100%;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+.stNumberInput input {
+    font-size: 34px !important;
+    text-align: center !important;
+    padding: 12px !important;
+    border-radius: 16px !important;
+}
+
+.hint {
+    text-align: center;
+    color: gray;
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# 🚀 Header
 st.markdown('<div class="big-title">🪐 ¿Cuánto pesarías en otros planetas?</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">La gravedad cambia en cada planeta, y tu peso también.</div>', unsafe_allow_html=True)
 
-# Input centrado
-c1, c2, c3 = st.columns([1, 2, 1])
-with c2:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    peso_tierra = st.number_input("🌍 Ingresa tu peso en la Tierra (kg)", min_value=0.0, value=50.0, step=0.5)
-    st.markdown("</div>", unsafe_allow_html=True)
+# 🎯 Input perfectamente centrado
+col1, col2, col3 = st.columns([1,2,1])
+
+with col2:
+    peso_tierra = st.number_input(
+        "🌍 Ingresa tu peso en la Tierra (kg)",
+        min_value=0.0,
+        value=50.0,
+        step=0.5
+    )
 
 st.markdown('<div class="hint">Prueba diferentes valores y observa cómo cambian los resultados.</div>', unsafe_allow_html=True)
 
-# Datos
+# 🌍 Datos
 G_TIERRA = 9.80665
 planetas = [
     {"Planeta": "Mercurio", "Emoji": "☿️", "Gravedad": 3.70},
@@ -76,24 +85,23 @@ planetas = [
     {"Planeta": "Neptuno", "Emoji": "🔵", "Gravedad": 11.15},
 ]
 
-# Cálculos
+# 📊 Cálculos
 rows = []
 for p in planetas:
     factor = p["Gravedad"] / G_TIERRA
     peso_planeta = peso_tierra * factor
-    rows.append(
-        {
-            "Planeta": p["Planeta"],
-            "Emoji": p["Emoji"],
-            "Gravedad": p["Gravedad"],
-            "Factor": factor,
-            "Peso": peso_planeta,
-        }
-    )
+    rows.append({
+        "Planeta": p["Planeta"],
+        "Emoji": p["Emoji"],
+        "Gravedad": p["Gravedad"],
+        "Factor": factor,
+        "Peso": peso_planeta
+    })
 
 df = pd.DataFrame(rows)
 df["Etiqueta"] = df["Emoji"] + " " + df["Planeta"]
 
+# ✨ Resultados
 st.subheader("✨ Resultados")
 
 cols = st.columns(2)
@@ -104,13 +112,13 @@ for i, r in df.iterrows():
         st.metric(
             label="Peso estimado",
             value=f"{r['Peso']:.2f} kg",
-            delta=f"{(r['Factor'] - 1) * 100:+.1f}% vs Tierra",
+            delta=f"{(r['Factor'] - 1) * 100:+.1f}% vs Tierra"
         )
         st.caption(f"Gravedad: {r['Gravedad']:.2f} m/s²")
 
 st.divider()
 
-# Gráfica
+# 📈 Gráfica
 st.subheader("📊 Comparación visual")
 st.bar_chart(df.set_index("Etiqueta")["Peso"])
 
