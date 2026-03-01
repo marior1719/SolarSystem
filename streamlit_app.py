@@ -3,11 +3,68 @@ import pandas as pd
 
 st.set_page_config(page_title="Peso en los Planetas", page_icon="🪐", layout="centered")
 
-st.title("🪐 Peso en los Planetas")
-st.write("Descubre cuánto pesarías en cada planeta del Sistema Solar según la gravedad.")
+# Estilos personalizados
+st.markdown(
+    """
+    <style>
+    .big-title {
+        font-size: 52px;
+        font-weight: 900;
+        text-align: center;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        line-height: 1.05;
+    }
+    .subtitle {
+        font-size: 18px;
+        text-align: center;
+        color: rgba(255,255,255,0.70);
+        margin-bottom: 22px;
+    }
+    .card {
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.03);
+        margin-bottom: 14px;
+    }
+    .hint {
+        text-align: center;
+        color: rgba(255,255,255,0.60);
+        font-size: 13px;
+        margin-top: -8px;
+        margin-bottom: 18px;
+    }
+    .stNumberInput label {
+        font-size: 18px !important;
+        font-weight: 700 !important;
+    }
+    .stNumberInput input {
+        font-size: 30px !important;
+        text-align: center !important;
+        padding: 10px !important;
+        border-radius: 14px !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
+# Header
+st.markdown('<div class="big-title">🪐 ¿Cuánto pesarías en otros planetas?</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">La gravedad cambia en cada planeta, y tu peso también.</div>', unsafe_allow_html=True)
+
+# Input centrado
+c1, c2, c3 = st.columns([1, 2, 1])
+with c2:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    peso_tierra = st.number_input("🌍 Ingresa tu peso en la Tierra (kg)", min_value=0.0, value=50.0, step=0.5)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+st.markdown('<div class="hint">Prueba diferentes valores y observa cómo cambian los resultados.</div>', unsafe_allow_html=True)
+
+# Datos
 G_TIERRA = 9.80665
-
 planetas = [
     {"Planeta": "Mercurio", "Emoji": "☿️", "Gravedad": 3.70},
     {"Planeta": "Venus", "Emoji": "♀️", "Gravedad": 8.87},
@@ -19,30 +76,23 @@ planetas = [
     {"Planeta": "Neptuno", "Emoji": "🔵", "Gravedad": 11.15},
 ]
 
-peso_tierra = st.number_input(
-    "Tu peso en la Tierra (kg)",
-    min_value=0.0,
-    value=50.0,
-    step=0.5
-)
-
-# Crear datos
+# Cálculos
 rows = []
 for p in planetas:
     factor = p["Gravedad"] / G_TIERRA
     peso_planeta = peso_tierra * factor
-    rows.append({
-        "Planeta": p["Planeta"],
-        "Emoji": p["Emoji"],
-        "Gravedad": p["Gravedad"],
-        "Factor": factor,
-        "Peso": peso_planeta
-    })
+    rows.append(
+        {
+            "Planeta": p["Planeta"],
+            "Emoji": p["Emoji"],
+            "Gravedad": p["Gravedad"],
+            "Factor": factor,
+            "Peso": peso_planeta,
+        }
+    )
 
 df = pd.DataFrame(rows)
 df["Etiqueta"] = df["Emoji"] + " " + df["Planeta"]
-
-max_peso = max(df["Peso"].max(), 0.0001)
 
 st.subheader("✨ Resultados")
 
@@ -54,19 +104,17 @@ for i, r in df.iterrows():
         st.metric(
             label="Peso estimado",
             value=f"{r['Peso']:.2f} kg",
-            delta=f"{(r['Factor'] - 1) * 100:+.1f}% vs Tierra"
+            delta=f"{(r['Factor'] - 1) * 100:+.1f}% vs Tierra",
         )
-        st.progress(float(r["Peso"] / max_peso))
-        st.caption(f"Gravedad: {r['Gravedad']} m/s²")
+        st.caption(f"Gravedad: {r['Gravedad']:.2f} m/s²")
 
 st.divider()
 
-st.subheader("📊 Comparación Visual")
-
-chart = df.set_index("Etiqueta")["Peso"]
-st.bar_chart(chart)
+# Gráfica
+st.subheader("📊 Comparación visual")
+st.bar_chart(df.set_index("Etiqueta")["Peso"])
 
 st.caption(
     "El peso cambia porque cada planeta tiene una gravedad diferente. "
-    "Para calcularlo usamos la proporción entre la gravedad del planeta y la gravedad de la Tierra."
+    "Cálculo: peso en planeta = peso en Tierra × (gravedad del planeta / gravedad de la Tierra)."
 )
