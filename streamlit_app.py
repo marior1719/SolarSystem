@@ -13,23 +13,23 @@ st.markdown("""
   color: #e9eef7;
 }
 
-/* Espaciado */
-.block-container {
-  padding-top: 4.5rem;
-  padding-bottom: 2.5rem;
-  max-width: 1250px;
+/* MÁS espacio arriba */
+.block-container { 
+  padding-top: 4.5rem; 
+  padding-bottom: 2.5rem; 
+  max-width: 1250px; 
 }
 
-/* Oculta barra superior Streamlit */
-header { visibility: hidden; }
+/* Oculta línea gris superior */
+header {visibility: hidden;}
 #MainMenu, footer { visibility: hidden; }
 
 /* Header */
-.header-wrap {
-  display:flex;
-  align-items:center;
-  gap:14px;
-  margin-bottom: 40px;
+.header-wrap { 
+  display:flex; 
+  align-items:center; 
+  gap:14px; 
+  margin-bottom: 40px; 
 }
 .logo {
   width:44px; height:44px; border-radius: 14px;
@@ -41,7 +41,12 @@ header { visibility: hidden; }
 .title { font-size: 42px; font-weight: 900; margin:0; }
 .subtitle { font-size: 14px; color: rgba(233,238,247,0.65); }
 
-/* Card izquierda */
+/* ✅ Mata SOLO bloques vacíos (ese fantasma) */
+div[data-testid="stVerticalBlock"] > div:empty {
+  display: none !important;
+}
+
+/* Panel izquierdo */
 .card {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.09);
@@ -119,51 +124,6 @@ header { visibility: hidden; }
 .p-value { font-size: 30px; font-weight: 900; }
 .p-unit { font-size: 12px; color: rgba(233,238,247,0.65); margin-left: 6px; }
 .p-g { font-size: 12px; color: rgba(233,238,247,0.55); text-align:right; }
-
-/* ================================
-   AQUI ESTA LA SOLUCION
-   Tomo la capsula vacia de la izquierda
-   y le meto texto dentro
-   ================================ */
-
-/* Ubico la primera columna (izquierda) y su primer bloque (la capsula vacia) */
-div[data-testid="stHorizontalBlock"] > div:first-child
-  div[data-testid="stVerticalBlock"] > div:first-child {
-
-  background: rgba(255,255,255,0.035) !important;
-  border: 1px solid rgba(255,255,255,0.09) !important;
-  border-radius: 22px !important;
-  padding: 18px 20px !important;
-  margin-bottom: 14px !important;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.30) !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-
-  min-height: 58px !important;
-}
-
-/* Texto izquierdo dentro de esa capsula */
-div[data-testid="stHorizontalBlock"] > div:first-child
-  div[data-testid="stVerticalBlock"] > div:first-child::before {
-
-  content: "INPUT WEIGHT" !important;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 800;
-  color: rgba(233,238,247,0.72);
-}
-
-/* Texto derecho dentro de esa capsula */
-div[data-testid="stHorizontalBlock"] > div:first-child
-  div[data-testid="stVerticalBlock"] > div:first-child::after {
-
-  content: "Units: KG" !important;
-  font-size: 12px;
-  color: rgba(233,238,247,0.55);
-}
 
 </style>
 """, unsafe_allow_html=True)
