@@ -13,13 +13,14 @@ st.markdown("""
   color: #e9eef7;
 }
 
-/* Espaciado */
+/* MÁS espacio arriba */
 .block-container { 
   padding-top: 4.5rem; 
   padding-bottom: 2.5rem; 
   max-width: 1250px; 
 }
 
+/* Oculta línea gris superior */
 header {visibility: hidden;}
 #MainMenu, footer { visibility: hidden; }
 
@@ -40,7 +41,7 @@ header {visibility: hidden;}
 .title { font-size: 42px; font-weight: 900; margin:0; }
 .subtitle { font-size: 14px; color: rgba(233,238,247,0.65); }
 
-/* Card izquierda */
+/* Panel izquierdo */
 .card {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.09);
@@ -58,6 +59,47 @@ header {visibility: hidden;}
 }
 
 .section-gap { height: 18px; }
+
+/* ✅ Cápsula superior: ahora sí con texto (para que no se vea vacía) */
+.pill {
+  width: 100%;
+  border-radius: 22px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.09);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.30);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.pill-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.pill-badge{
+  width:34px;
+  height:34px;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(255,120,60,0.12);
+  border: 1px solid rgba(255,120,60,0.25);
+  font-size: 16px;
+}
+.pill-title{
+  font-size: 12px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: rgba(233,238,247,0.70);
+  font-weight: 800;
+}
+.pill-right{
+  font-size: 12px;
+  color: rgba(233,238,247,0.55);
+}
 
 /* Input */
 .stNumberInput label { display:none !important; }
@@ -150,6 +192,19 @@ left, right = st.columns([1.05, 1.45], gap="large")
 with left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
 
+    # ✅ Aquí está: la “barra” ahora se usa como pill con texto
+    st.markdown("""
+    <div class="pill">
+      <div class="pill-left">
+        <div class="pill-badge">⚖️</div>
+        <div>
+          <div class="pill-title">Input Weight</div>
+        </div>
+      </div>
+      <div class="pill-right">Units: KG</div>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown('<div class="section-title">Your Earth Weight (kg)</div>', unsafe_allow_html=True)
 
     earth_weight = st.number_input(
@@ -161,7 +216,6 @@ with left:
     )
 
     st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
-
     st.button("Sync with NASA")
 
     st.markdown("""
