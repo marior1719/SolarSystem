@@ -2,6 +2,19 @@ import streamlit as st
 
 st.set_page_config(page_title="Solar System Weight Explorer", page_icon="🪐", layout="wide")
 
+# ---------- Helpers ----------
+def set_unit(u: str):
+    st.session_state["unit"] = u
+
+def init_state():
+    if "unit" not in st.session_state:
+        st.session_state["unit"] = "kg"
+    if "earth_kg" not in st.session_state:
+        st.session_state["earth_kg"] = 50.0  # valor inicial en kg
+
+init_state()
+
+# ---------- CSS ----------
 st.markdown("""
 <style>
 
@@ -59,21 +72,32 @@ header {visibility: hidden;}
 
 .section-gap { height: 18px; }
 
-/* Radio pills */
-div[role="radiogroup"] { gap: 10px; }
-div[role="radiogroup"] label {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 14px;
+/* Toggle (sin st.radio) */
+.toggle-wrap {
+  display:flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.toggle-wrap .stButton button {
+  width: 110px;
   padding: 10px 14px;
+  border-radius: 14px;
+  font-weight: 800;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  color: rgba(233,238,247,0.80);
+  box-shadow: none;
+}
+.toggle-wrap .stButton button:hover {
+  border-color: rgba(255,255,255,0.22);
+  filter: none;
 }
 
-/* ✅ QUITA SOLO LA BARRA FEA ARRIBA DEL RADIO (dentro del wrapper unit-wrap) */
-.unit-wrap > div:first-child {
-  display: none !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
+/* Botón activo */
+.toggle-wrap .stButton button.active {
+  border: 0 !important;
+  color: #10131a !important;
+  background: linear-gradient(90deg, #ff8a3d, #ff5b62) !important;
 }
 
 /* Input */
@@ -86,8 +110,8 @@ div[role="radiogroup"] label {
   background: rgba(255,255,255,0.03) !important;
 }
 
-/* Botón */
-.stButton button {
+/* Botón principal */
+.primary .stButton button {
   width: 100%;
   padding: 14px 16px;
   border-radius: 16px;
@@ -96,7 +120,9 @@ div[role="radiogroup"] label {
   border: 0;
   color: #10131a;
   background: linear-gradient(90deg, #ff8a3d, #ff5b62);
+  box-shadow: 0 12px 30px rgba(255,100,80,0.25);
 }
+.primary .stButton button:hover { filter: brightness(1.05); }
 
 /* Info box */
 .info {
@@ -141,7 +167,7 @@ div[role="radiogroup"] label {
 </style>
 """, unsafe_allow_html=True)
 
-# Header
+# ---------- Header ----------
 st.markdown("""
 <div class="header-wrap">
   <div class="logo">🚀</div>
@@ -152,8 +178,10 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Datos
+# ---------- Data ----------
 G_EARTH = 9.80665
+LB_PER_KG = 2.2046226218
+
 planets = [
     ("Mercury", 3.70, "linear-gradient(145deg, #8a95a6, #2f3540)"),
     ("Venus", 8.87, "linear-gradient(145deg, #ffb25a, #b85a11)"),
@@ -165,28 +193,54 @@ planets = [
     ("Neptune", 11.15, "linear-gradient(145deg, #6b86ff, #1430b3)"),
 ]
 
+# ---------- Layout ----------
 left, right = st.columns([1.05, 1.45], gap="large")
 
 with left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
 
-    # ✅ wrapper para poder matar SOLO la barra fea del radio
-    st.markdown('<div class="unit-wrap">', unsafe_allow_html=True)
-    unit = st.radio("Units", ["kg", "lbs"], horizontal=True, label_visibility="collapsed")
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Toggle sin st.radio (sin barra fea)
+    st.markdown('<div class="toggle-wrap">', unsafe_allow_html=True)
+    b1, b2, _ = st.columns([0.18, 0.18, 0.64])
+    with b1:
+        if st.button("kg", key="btn_kg"):
+            set_unit("kg")
+    with b2:
+        if st.button("lbs", key="btn_lbs"):
+            set_unit("lbs")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
+    # Marca visual de botón activo (CSS class "active") usando un pequeño truco
+    # Streamlit no permite setear class en botones directamente, así que lo hacemos con JS mínimo.
+    active = st.session_state["unit"]
+    st.markdown(f"""
+    <script>
+      const buttons = window.parent.document.querySelectorAll('button[kind="secondary"]');
+      // Busca los botones por texto exacto y les pone clase "active" al seleccionado
+      buttons.forEach(b => {{
+        if (b.innerText.trim() === "kg") b.classList.toggle("active", "{active}" === "kg");
+        if (b.innerText.trim() === "lbs") b.classList.toggle("active", "{active}" === "lbs");
+      }});
+    </script>
+    """, unsafe_allow_html=True)
 
     st.markdown('<div class="section-title">Your Earth Weight</div>', unsafe_allow_html=True)
 
-    if unit == "kg":
-        earth_weight = st.number_input("Earth weight", min_value=0.0, value=50.0, step=0.5, label_visibility="collapsed")
+    # Mantener SIEMPRE un solo valor fuente en kg en session_state
+    if st.session_state["unit"] == "kg":
+        shown = st.session_state["earth_kg"]
+        val = st.number_input("Earth weight", min_value=0.0, value=float(shown), step=0.5, label_visibility="collapsed")
+        st.session_state["earth_kg"] = float(val)
     else:
-        earth_weight = st.number_input("Earth weight", min_value=0.0, value=110.2, step=0.5, label_visibility="collapsed")
+        shown_lbs = st.session_state["earth_kg"] * LB_PER_KG
+        val_lbs = st.number_input("Earth weight", min_value=0.0, value=float(shown_lbs), step=0.5, label_visibility="collapsed")
+        st.session_state["earth_kg"] = float(val_lbs) / LB_PER_KG
 
     st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
 
+    st.markdown('<div class="primary">', unsafe_allow_html=True)
     st.button("Sync with NASA")
+    st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("""
     <div class="info">
@@ -199,14 +253,14 @@ with left:
     st.markdown('</div>', unsafe_allow_html=True)
 
 with right:
-    if unit == "kg":
-        earth_kg = earth_weight
+    earth_kg = st.session_state["earth_kg"]
+
+    if st.session_state["unit"] == "kg":
         out_unit = "KG"
         to_display = lambda xkg: xkg
     else:
-        earth_kg = earth_weight / 2.2046226218
         out_unit = "LBS"
-        to_display = lambda xkg: xkg * 2.2046226218
+        to_display = lambda xkg: xkg * LB_PER_KG
 
     cA, cB = st.columns(2, gap="large")
 
