@@ -13,23 +13,23 @@ st.markdown("""
   color: #e9eef7;
 }
 
-/* MÁS espacio arriba */
-.block-container { 
-  padding-top: 4.5rem; 
-  padding-bottom: 2.5rem; 
-  max-width: 1250px; 
+/* Espaciado */
+.block-container {
+  padding-top: 4.5rem;
+  padding-bottom: 2.5rem;
+  max-width: 1250px;
 }
 
-/* Oculta línea gris superior */
-header {visibility: hidden;}
+/* Oculta barra superior Streamlit */
+header { visibility: hidden; }
 #MainMenu, footer { visibility: hidden; }
 
 /* Header */
-.header-wrap { 
-  display:flex; 
-  align-items:center; 
-  gap:14px; 
-  margin-bottom: 40px; 
+.header-wrap {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom: 40px;
 }
 .logo {
   width:44px; height:44px; border-radius: 14px;
@@ -41,7 +41,7 @@ header {visibility: hidden;}
 .title { font-size: 42px; font-weight: 900; margin:0; }
 .subtitle { font-size: 14px; color: rgba(233,238,247,0.65); }
 
-/* Panel izquierdo */
+/* Card izquierda */
 .card {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.09);
@@ -59,47 +59,6 @@ header {visibility: hidden;}
 }
 
 .section-gap { height: 18px; }
-
-/* ✅ Cápsula superior: ahora sí con texto (para que no se vea vacía) */
-.pill {
-  width: 100%;
-  border-radius: 22px;
-  padding: 18px 20px;
-  margin-bottom: 14px;
-  background: rgba(255,255,255,0.035);
-  border: 1px solid rgba(255,255,255,0.09);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.30);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-.pill-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.pill-badge{
-  width:34px;
-  height:34px;
-  border-radius: 14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background: rgba(255,120,60,0.12);
-  border: 1px solid rgba(255,120,60,0.25);
-  font-size: 16px;
-}
-.pill-title{
-  font-size: 12px;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  color: rgba(233,238,247,0.70);
-  font-weight: 800;
-}
-.pill-right{
-  font-size: 12px;
-  color: rgba(233,238,247,0.55);
-}
 
 /* Input */
 .stNumberInput label { display:none !important; }
@@ -161,6 +120,51 @@ header {visibility: hidden;}
 .p-unit { font-size: 12px; color: rgba(233,238,247,0.65); margin-left: 6px; }
 .p-g { font-size: 12px; color: rgba(233,238,247,0.55); text-align:right; }
 
+/* ================================
+   AQUI ESTA LA SOLUCION
+   Tomo la capsula vacia de la izquierda
+   y le meto texto dentro
+   ================================ */
+
+/* Ubico la primera columna (izquierda) y su primer bloque (la capsula vacia) */
+div[data-testid="stHorizontalBlock"] > div:first-child
+  div[data-testid="stVerticalBlock"] > div:first-child {
+
+  background: rgba(255,255,255,0.035) !important;
+  border: 1px solid rgba(255,255,255,0.09) !important;
+  border-radius: 22px !important;
+  padding: 18px 20px !important;
+  margin-bottom: 14px !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.30) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  min-height: 58px !important;
+}
+
+/* Texto izquierdo dentro de esa capsula */
+div[data-testid="stHorizontalBlock"] > div:first-child
+  div[data-testid="stVerticalBlock"] > div:first-child::before {
+
+  content: "INPUT WEIGHT" !important;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(233,238,247,0.72);
+}
+
+/* Texto derecho dentro de esa capsula */
+div[data-testid="stHorizontalBlock"] > div:first-child
+  div[data-testid="stVerticalBlock"] > div:first-child::after {
+
+  content: "Units: KG" !important;
+  font-size: 12px;
+  color: rgba(233,238,247,0.55);
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -175,6 +179,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# Datos
 G_EARTH = 9.80665
 planets = [
     ("Mercury", 3.70, "linear-gradient(145deg, #8a95a6, #2f3540)"),
@@ -191,19 +196,6 @@ left, right = st.columns([1.05, 1.45], gap="large")
 
 with left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-
-    # ✅ Aquí está: la “barra” ahora se usa como pill con texto
-    st.markdown("""
-    <div class="pill">
-      <div class="pill-left">
-        <div class="pill-badge">⚖️</div>
-        <div>
-          <div class="pill-title">Input Weight</div>
-        </div>
-      </div>
-      <div class="pill-right">Units: KG</div>
-    </div>
-    """, unsafe_allow_html=True)
 
     st.markdown('<div class="section-title">Your Earth Weight (kg)</div>', unsafe_allow_html=True)
 
