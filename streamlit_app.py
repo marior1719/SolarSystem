@@ -13,14 +13,13 @@ st.markdown("""
   color: #e9eef7;
 }
 
-/* MÁS espacio arriba */
+/* Espaciado */
 .block-container { 
   padding-top: 4.5rem; 
   padding-bottom: 2.5rem; 
   max-width: 1250px; 
 }
 
-/* Oculta línea gris superior */
 header {visibility: hidden;}
 #MainMenu, footer { visibility: hidden; }
 
@@ -41,8 +40,8 @@ header {visibility: hidden;}
 .title { font-size: 42px; font-weight: 900; margin:0; }
 .subtitle { font-size: 14px; color: rgba(233,238,247,0.65); }
 
-/* ✅ Card REAL: estiliza la columna izquierda (sin HTML abierto/cerrado) */
-div[data-testid="stHorizontalBlock"] > div:first-child div[data-testid="stVerticalBlock"] > div:first-child {
+/* Card izquierda */
+.card {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.09);
   border-radius: 22px;
@@ -50,7 +49,6 @@ div[data-testid="stHorizontalBlock"] > div:first-child div[data-testid="stVertic
   box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
-/* Texto secciones */
 .section-title {
   font-size: 13px;
   letter-spacing: 1.6px;
@@ -58,6 +56,7 @@ div[data-testid="stHorizontalBlock"] > div:first-child div[data-testid="stVertic
   color: rgba(233,238,247,0.65);
   margin-bottom: 10px;
 }
+
 .section-gap { height: 18px; }
 
 /* Input */
@@ -134,7 +133,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Datos
 G_EARTH = 9.80665
 planets = [
     ("Mercury", 3.70, "linear-gradient(145deg, #8a95a6, #2f3540)"),
@@ -150,6 +148,8 @@ planets = [
 left, right = st.columns([1.05, 1.45], gap="large")
 
 with left:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
     st.markdown('<div class="section-title">Your Earth Weight (kg)</div>', unsafe_allow_html=True)
 
     earth_weight = st.number_input(
@@ -172,15 +172,14 @@ with left:
     </div>
     """, unsafe_allow_html=True)
 
-with right:
-    earth_kg = earth_weight
-    out_unit = "KG"
+    st.markdown('</div>', unsafe_allow_html=True)
 
+with right:
     cA, cB = st.columns(2, gap="large")
 
     for idx, (name, g, grad) in enumerate(planets):
         factor = g / G_EARTH
-        w_out = earth_kg * factor
+        w_out = earth_weight * factor
         target = cA if idx % 2 == 0 else cB
 
         with target:
@@ -190,7 +189,7 @@ with right:
                 <div class="p-dot" style="background:{grad};"></div>
                 <div>
                   <div class="p-name">{name}</div>
-                  <div class="p-value">{w_out:.1f}<span class="p-unit">{out_unit}</span></div>
+                  <div class="p-value">{w_out:.1f}<span class="p-unit">KG</span></div>
                 </div>
               </div>
               <div class="p-g">Gravity:<br>{factor:.3f}G</div>
