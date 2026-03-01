@@ -22,7 +22,6 @@ st.markdown("""
 
 /* Oculta línea gris superior */
 header {visibility: hidden;}
-#MainMenu, footer { visibility: hidden; }
 
 /* Header */
 .header-wrap { 
@@ -40,11 +39,6 @@ header {visibility: hidden;}
 }
 .title { font-size: 42px; font-weight: 900; margin:0; }
 .subtitle { font-size: 14px; color: rgba(233,238,247,0.65); }
-
-/* ✅ Mata SOLO bloques vacíos (ese fantasma) */
-div[data-testid="stVerticalBlock"] > div:empty {
-  display: none !important;
-}
 
 /* Panel izquierdo */
 .card {
@@ -64,6 +58,15 @@ div[data-testid="stVerticalBlock"] > div:empty {
 }
 
 .section-gap { height: 18px; }
+
+/* Radio pills */
+div[role="radiogroup"] { gap: 10px; }
+div[role="radiogroup"] label {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  padding: 10px 14px;
+}
 
 /* Input */
 .stNumberInput label { display:none !important; }
@@ -125,6 +128,8 @@ div[data-testid="stVerticalBlock"] > div:empty {
 .p-unit { font-size: 12px; color: rgba(233,238,247,0.65); margin-left: 6px; }
 .p-g { font-size: 12px; color: rgba(233,238,247,0.55); text-align:right; }
 
+#MainMenu, footer { visibility: hidden; }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -157,17 +162,19 @@ left, right = st.columns([1.05, 1.45], gap="large")
 with left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
 
-    st.markdown('<div class="section-title">Your Earth Weight (kg)</div>', unsafe_allow_html=True)
-
-    earth_weight = st.number_input(
-        "Earth weight",
-        min_value=0.0,
-        value=50.0,
-        step=0.5,
-        label_visibility="collapsed"
-    )
+    unit = st.radio("Units", ["kg", "lbs"], horizontal=True, label_visibility="collapsed")
 
     st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="section-title">Your Earth Weight</div>', unsafe_allow_html=True)
+
+    if unit == "kg":
+        earth_weight = st.number_input("Earth weight", min_value=0.0, value=50.0, step=0.5, label_visibility="collapsed")
+    else:
+        earth_weight = st.number_input("Earth weight", min_value=0.0, value=110.2, step=0.5, label_visibility="collapsed")
+
+    st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
+
     st.button("Sync with NASA")
 
     st.markdown("""
@@ -181,11 +188,20 @@ with left:
     st.markdown('</div>', unsafe_allow_html=True)
 
 with right:
+    if unit == "kg":
+        earth_kg = earth_weight
+        out_unit = "KG"
+        to_display = lambda xkg: xkg
+    else:
+        earth_kg = earth_weight / 2.2046226218
+        out_unit = "LBS"
+        to_display = lambda xkg: xkg * 2.2046226218
+
     cA, cB = st.columns(2, gap="large")
 
     for idx, (name, g, grad) in enumerate(planets):
         factor = g / G_EARTH
-        w_out = earth_weight * factor
+        w_out = to_display(earth_kg * factor)
         target = cA if idx % 2 == 0 else cB
 
         with target:
@@ -195,7 +211,7 @@ with right:
                 <div class="p-dot" style="background:{grad};"></div>
                 <div>
                   <div class="p-name">{name}</div>
-                  <div class="p-value">{w_out:.1f}<span class="p-unit">KG</span></div>
+                  <div class="p-value">{w_out:.1f}<span class="p-unit">{out_unit}</span></div>
                 </div>
               </div>
               <div class="p-g">Gravity:<br>{factor:.3f}G</div>
